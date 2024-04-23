@@ -1,10 +1,12 @@
 package com.techsoft.springsecurity.service;
 
+import com.techsoft.springsecurity.logout.BlackList;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +16,8 @@ import java.util.function.Function;
 
 @Component
 public class JwtService {
+    @Autowired
+    private BlackList blackList;
     private static final String SECERET = "!@#$FDGSDFGSGSGSGSHSHSHSSHGFFDSGSFGSSGHSDFSDFSFSFSFSDFSFSFSF";
 
     public String generateToken(String userName){
@@ -54,6 +58,6 @@ public class JwtService {
     }
     public Boolean validateToken(String token, UserDetails userDetails){
         final String userName= extractUserName(token);
-        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (userName.equals(userDetails.getUsername()) && !isTokenExpired(token) && !blackList.isBlackListed(token));
     }
 }
